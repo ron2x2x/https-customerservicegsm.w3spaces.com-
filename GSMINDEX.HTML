@@ -1,0 +1,1879 @@
+<!DOCTYPE html>
+<html lang="en" class="transition-colors duration-300">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GSM Customer Service Knowledge Base</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Basic animation for suggestion items */
+    .suggestion-item {
+      opacity: 0;
+      transform: translateY(-10px);
+      animation: fadeInSlideIn 0.3s forwards;
+    }
+
+    @keyframes fadeInSlideIn {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    /* Hide the default datalist dropdown arrow */
+    input[list]::-webkit-calendar-picker-indicator {
+      display: none !important;
+    }
+    input[list]::-moz-calendar-picker-indicator {
+      display: none !important;
+    }
+    input[list]::-ms-reveal {
+      display: none !important;
+    }
+
+    /* Style for highlighted text in suggestions */
+    .highlight {
+      background-color: yellow;
+      color: black; /* Ensure highlighted text is readable */
+    }
+
+    /* Style for the answer container with margin */
+    #answer-container {
+      width: auto;
+      min-height: 100vh;
+      background-color: white;
+      color: #1f2937; /* Tailwind gray-800 for general text */
+      padding: 2.5rem; /* Increased padding for more professional look */
+      margin-left: 5%; /* Relative margin for responsiveness */
+      margin-right: 5%; /* Relative margin for responsiveness */
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+      border-radius: 0.5rem; /* Slightly rounded corners */
+      box-sizing: border-box; /* Include padding in width calculation */
+      transition: background-color 0.3s, color 0.3s, box-shadow 0.3s;
+    }
+
+    /* Responsive adjustments for larger screens */
+    @media (min-width: 768px) {
+      #answer-container {
+        margin-left: 10%; /* Larger margins on wider screens */
+        margin-right: 10%;
+        padding: 3rem; /* More padding for larger screens */
+      }
+    }
+
+    /* Further adjustments for very large screens to keep content readable */
+    @media (min-width: 1024px) {
+      #answer-container {
+        max-width: 1000px; /* Max width to prevent content from stretching too wide */
+        margin-left: auto; /* Center the block */
+        margin-right: auto; /* Center the block */
+      }
+    }
+
+    /* --- Styles for elements inside #answer-container (always light mode) --- */
+    /* All general text and heading colors will be light mode */
+    #answer-container h1,
+    #answer-container h2,
+    #answer-container h3 {
+        color: #1f2937; /* Default dark text for headings */
+    }
+    #answer-container p,
+    #answer-container ul,
+    #answer-container ol,
+    #answer-container li,
+    #answer-container strong {
+        color: #374151; /* Default dark text for general content (gray-700) */
+    }
+    #answer-container a {
+        color: #2563eb; /* Default blue for links (blue-600) */
+    }
+
+    /* Specific text colors used in answers (maintain light mode appearance) */
+    #answer-container .text-blue-700 { color: #1d4ed8; }
+    #answer-container .text-green-700 { color: #047857; }
+    #answer-container .text-purple-700 { color: #6d28d9; }
+    #answer-container .text-indigo-700 { color: #4338ca; }
+    #answer-container .text-red-700 { color: #b91c1c; }
+    #answer-container .text-yellow-700 { color: #b45309; }
+    #answer-container .text-green-800 { color: #065f46; }
+    #answer-container .text-pink-700 { color: #be185d; }
+    #answer-container .text-gray-700 { color: #374151; }
+    #answer-container .text-gray-800 { color: #1f2937; }
+    #answer-container .text-gray-600 { color: #4b5563; }
+
+
+    /* Table specific styles inside #answer-container (always light mode) */
+    #answer-container table {
+        border-collapse: collapse; /* Ensure consistent borders */
+        border: 1px solid #d1d5db; /* Light gray border for the outer table */
+    }
+    #answer-container th, #answer-container td {
+        border: 1px solid #e5e7eb; /* Lighter gray border for cells */
+        padding: 0.75rem 1rem; /* Generous padding */
+        text-align: left;
+        vertical-align: top;
+        color: #374151; /* Dark text for table cells */
+    }
+    #answer-container th {
+        background-color: #2563eb; /* Blue-600 for header */
+        color: white; /* White text for header */
+        font-weight: 600;
+    }
+    #answer-container tbody tr:nth-child(odd) {
+        background-color: #eff6ff; /* Blue-50 for odd rows */
+    }
+    #answer-container tbody tr:nth-child(even) {
+        background-color: white; /* White for even rows */
+    }
+    /* Ensure nested tables inherit base table cell styles but remain light */
+    #answer-container table table th,
+    #answer-container table table td {
+      border: 1px solid #e5e7eb; /* Lighter border for nested tables */
+      background-color: white; /* Default white background for nested table cells */
+      color: #374151; /* Default dark text for nested table cells */
+    }
+    #answer-container table table thead th {
+      background-color: #2563eb; /* Blue-600 for nested table headers */
+      color: white;
+    }
+    #answer-container table table tbody tr:nth-child(odd) {
+      background-color: #eff6ff; /* Blue-50 for nested odd rows */
+    }
+    #answer-container table table tbody tr:nth-child(even) {
+      background-color: white; /* White for nested even rows */
+    }
+
+    /* Sidebar specific styles */
+    #sidebar-left, #sidebar-right {
+      position: fixed;
+      top: 0;
+      height: 100vh;
+      background-color: #374151; /* Tailwind gray-700 */
+      color: white;
+      padding: 1.5rem;
+      box-shadow: 2px 0 5px rgba(0,0,0,0.5);
+      transition: all 0.3s ease-in-out;
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto; /* Enable scrolling for long lists */
+    }
+
+    #sidebar-left {
+      left: -280px; /* Initially off-screen */
+      width: 250px; /* Width of the sidebar */
+    }
+
+    #sidebar-left.open {
+      left: 0; /* Slide in */
+    }
+
+    #sidebar-right {
+      right: -280px; /* Initially off-screen */
+      width: 250px; /* Width of the sidebar */
+      box-shadow: -2px 0 5px rgba(0,0,0,0.5); /* Shadow on the left */
+    }
+
+    #sidebar-right.open {
+      right: 0; /* Slide in */
+    }
+
+    .sidebar-close-button {
+      align-self: flex-end;
+      background: none;
+      border: none;
+      color: white;
+      font-size: 2rem;
+      cursor: pointer;
+      margin-bottom: 1rem;
+      line-height: 1; /* Adjust line height to center 'x' */
+    }
+
+    #sidebar-left a, #sidebar-right a {
+      display: block;
+      padding: 0.75rem 0;
+      color: white;
+      text-decoration: none;
+      transition: background-color 0.2s ease-in-out;
+      border-radius: 0.25rem;
+    }
+
+    #sidebar-left a:hover, #sidebar-right a:hover {
+      background-color: #4b5563; /* Tailwind gray-600 */
+    }
+
+    /* Hamburger menu icon */
+    .hamburger-menu {
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+      width: 30px;
+      height: 25px;
+      padding: 5px;
+      box-sizing: border-box;
+    }
+
+    .hamburger-menu span {
+      display: block;
+      width: 100%;
+      height: 3px;
+      background-color: #1f2937; /* Dark gray for the bars */
+      border-radius: 2px;
+      transition: all 0.3s ease-in-out;
+    }
+
+    /* Overlay for when sidebar is open */
+    #overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0,0,0,0.5);
+      z-index: 99;
+      display: none; /* Initially hidden */
+    }
+
+    #overlay.active {
+      display: block; /* Show when active */
+    }
+
+    /* Adjust main content when sidebar is open (optional, but good for pushing content) */
+    body.sidebar-left-open {
+      margin-left: 250px; /* Push content to the right */
+      transition: margin-left 0.3s ease-in-out;
+    }
+    body.sidebar-right-open {
+      margin-right: 250px; /* Push content to the left */
+      transition: margin-right 0.3s ease-in-out;
+    }
+    body.sidebar-left-open.sidebar-right-open {
+      margin-left: 250px;
+      margin-right: 250px;
+    }
+
+    /* Style for collapsible sections within the right sidebar */
+    .collapsible-header {
+      background-color: #4b5563; /* Slightly lighter gray than sidebar background */
+      color: white;
+      padding: 0.5rem 1rem;
+      cursor: pointer;
+      margin-top: 1rem;
+      border-radius: 0.25rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .collapsible-header:hover {
+      background-color: #6b7280;
+    }
+
+    .collapsible-content {
+      padding: 0.5rem 0;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease-out;
+    }
+
+    .collapsible-content.open {
+      max-height: 500px; /* Adjust as needed to fit content */
+    }
+
+    .arrow {
+      transition: transform 0.3s ease-in-out;
+    }
+
+    .arrow.rotate {
+      transform: rotate(90deg);
+    }
+  </style>
+</head>
+<body class="bg-gray-100 text-gray-900 font-sans transition-colors duration-300">
+
+  <nav id="sidebar-left">
+    <button id="close-sidebar-left" class="sidebar-close-button">&times;</button>
+    <h2 class="text-xl font-bold mb-4">Quick Links</h2>
+    <a href="https://gsmorg-my.sharepoint.com/:f:/p/nwhite/EqNyxAwzCO9MiejJxEO_-OUBpvdyMYiy8GgQ58_dRL4bpQ?e=fpLgCN" target="_blank" rel="noopener noreferrer">Replacement Parts File</a>
+    <a href="https://gsmorg-my.sharepoint.com/:f:/p/nwhite/EnjNv4OJbCxGnP6qMLwYxfkBTk6FCZ1YYsV5ncYo2YAnVw?e=ErDaqh" target="_blank" rel="noopener noreferrer">Hunting Catalogs</a>
+    <a href="https://gsmorg-my.sharepoint.com/:f:/p/nwhite/EgXlynGcwLJMmwQBG_cZLRQBH1xdyvuNQvAulfnw9h2S-A?e=LbhvBI" target="_blank" rel="noopener noreferrer">Comparison Docs</a>
+    <a href="https://gsmorg-my.sharepoint.com/:x:/p/nwhite/ER5jeWj7Gf9NkOQlLsON8ccBO6Zjjcy5uUbRstmagtCxEQ?e=GhuGDY" target="_blank" rel="noopener noreferrer">GT Documents</a>
+    <a href="https://gsmorg-my.sharepoint.com/:w:/p/nwhite/EaYqT8XaZkJFtxI9Vgl4kgIBE7w47jJURzCJsD-T68dz_A?e=YrjgOY" target="_blank" rel="noopener noreferrer">Who to Contact</a>
+    <a href="https://gsmorg-my.sharepoint.com/:w:/p/nwhite/ERfTaJzoh0tOrVwIQoj8eYwBt-IMa0YhdSgCjEq4CI6CgA?e=Nf5DEo" target="_blank" rel="noopener noreferrer">GSM Brand Warranty Information</a>
+    <a href="https://gsmorg-my.sharepoint.com/:f:/p/nwhite/ElFmvQ5pWaNCgoQz17k16yQBLwgiOHtjFJl2d52Jg9Nx_g?e=cXnwlK" target="_blank" rel="noopener noreferrer">Fishing Catalogs</a>
+    <a href="https://gsmorg-my.sharepoint.com/:f:/p/nwhite/EjqTLBzNTghFrhw3QRlrilsBaQBxvLVCl6pYRbXFAgHjcg?e=FG8cuM" target="_blank" rel="noopener noreferrer">Rods - Phenix</a>
+    <a href="https://gsmorg-my.sharepoint.com/:x:/p/nwhite/EXm9AIA_FTRBpddgEIyW7jEBXnOMbZTpwpX0sbuufSJTjQ?e=4198Ld" target="_blank" rel="noopener noreferrer">Fishing Knowledge Base</a>
+    <a href="https://gsmorg-my.sharepoint.com/:b:/p/nwhite/EcYvUi7Q-XRMj7B2Wjym7DcBPr8Zl_RBKRAaa46J2zF-hQ?e=qsWpCD" target="_blank" rel="noopener noreferrer">GSM Fishing Email Templates</a>
+    <a href="https://gsmorg-my.sharepoint.com/:x:/r/personal/nwhite_gsmorg_com/_layouts/15/Doc.aspx?sourcedoc=%7BF6FA5527-7EDE-49DA-967A-43DE80DFA0D1%7D&file=BOX%20BLIND%20AND%20STAND%20INFO-UPDATED.xlsx&action=default&mobileredirect=true" target="_blank" rel="noopener noreferrer">Box Blind and Treestand Important Information</a>
+  </nav>
+
+  <nav id="sidebar-right">
+    <button id="close-sidebar-right" class="sidebar-close-button">&times;</button>
+    <h2 class="text-xl font-bold mb-4">GSM Outdoors Brands</h2>
+
+    <div class="collapsible-header" data-target="hunting-links">
+      <span>Hunting & Shooting Sports</span>
+      <span class="arrow">&gt;</span>
+    </div>
+    <div id="hunting-links" class="collapsible-content">
+      <a href="https://www.gsmoutdoors.com/" target="_blank" rel="noopener noreferrer">GSM Outdoors (Parent Company)</a>
+      <a href="https://sogknives.com/" target="_blank" rel="noopener noreferrer">SOG Knives</a>
+      <a href="https://www.stealthcam.com/" target="_blank" rel="noopener noreferrer">Stealth Cam</a>
+      <a href="https://www.walkersgameear.com/" target="_blank" rel="noopener noreferrer">Walker's</a>
+      <a href="https://www.gomuddy.com/" target="_blank" rel="noopener noreferrer">Muddy Outdoors</a>
+      <a href="https://hawkhunting.com/" target="_blank" rel="noopener noreferrer">Hawk Hunting</a>
+      <a href="https://www.biggametreestands.com/" target="_blank" rel="noopener noreferrer">Big Game Treestands</a>
+      <a href="https://www.birchwoodcasey.com/" target="_blank" rel="noopener noreferrer">Birchwood Casey</a>
+      <a href="https://www.shootingmadeeasy.com/" target="_blank" rel="noopener noreferrer">SME (Shooting Made Easy)</a>
+      <a href="https://www.hunterspec.com/" target="_blank" rel="noopener noreferrer">Hunters Specialties</a>
+      <a href="https://www.americanhunterfeeds.com/" target="_blank" rel="noopener noreferrer">American Hunter</a>
+      <a href="https://www.bossbuck.com/" target="_blank" rel="noopener noreferrer">Boss Buck</a>
+      <a href="https://www.buckbomb.com/" target="_blank" rel="noopener noreferrer">Buck Bomb</a>
+      <a href="https://www.newarcheryproducts.com/" target="_blank" rel="noopener noreferrer">New Archery Products (NAP)</a>
+      <a href="https://skullhooker.com/" target="_blank" rel="noopener noreferrer">Skull Hooker</a>
+      <a href="https://www.coyotelight.com/" target="_blank" rel="noopener noreferrer">Coyote Light</a>
+      <a href="https://www.cyclopssolutions.com/" target="_blank" rel="noopener noreferrer">Cyclops</a>
+      <a href="https://scentaway.com/" target="_blank" rel="noopener noreferrer">Scent-A-Way</a>
+      <a href="https://www.scentslammer.com/" target="_blank" rel="noopener noreferrer">Scent Slammer</a>
+      <a href="https://www.waynecarltonscalls.com/" target="_blank" rel="noopener noreferrer">Wayne Carlton's Calls</a>
+      <a href="https://johnnystewart.com/" target="_blank" rel="noopener noreferrer">Johnny Stewart</a>
+      <a href="https://www.downandoutblinds.com/" target="_blank" rel="noopener noreferrer">Down & Out Blinds</a>
+      <a href="https://www.tenzingoutdoors.com/" target="_blank" rel="noopener noreferrer">Tenzing</a>
+      <a href="https://halooptics.com/" target="_blank" rel="noopener noreferrer">Halo Optics</a>
+      <a href="https://www.ameristep.com/" target="_blank" rel="noopener noreferrer">Ameristep</a>
+      <a href="https://www.wildgameinnovations.com/" target="_blank" rel="noopener noreferrer">Wildgame Innovations</a>
+      <a href="https://www.coldsteel.com/" target="_blank" rel="noopener noreferrer">Cold Steel</a>
+      <a href="https://www.avian-x.com/" target="_blank" rel="noopener noreferrer">Avian-X</a>
+      <a href="https://www.flextonegamecalls.com/" target="_blank" rel="noopener noreferrer">Flextone Game Calls</a>
+      <a href="https://www.hsstrut.com/" target="_blank" rel="noopener noreferrer">HS Strut</a>
+      <a href="https://www.truglo.com/" target="_blank" rel="noopener noreferrer">TruGlo</a>
+      <a href="https://www.zinkcalls.com/" target="_blank" rel="noopener noreferrer">Zink Calls</a>
+      <a href="https://zerotrace.com/" target="_blank" rel="noopener noreferrer">ZeroTrace</a>
+    </div>
+
+    <div class="collapsible-header" data-target="fishing-links">
+      <span>Fishing</span>
+      <span class="arrow">&gt;</span>
+    </div>
+    <div id="fishing-links" class="collapsible-content">
+      <a href="https://www.bagleybait.com/" target="_blank" rel="noopener noreferrer">Bagley Baits</a>
+      <a href="https://www.billlewislures.com/" target="_blank" rel="noopener noreferrer">Bill Lewis Fishing</a>
+      <a href="https://www.bigbitebaits.com/" target="_blank" rel="noopener noreferrer">Big Bite Baits</a>
+      <a href="https://www.cudabrand.com/" target="_blank" rel="noopener noreferrer">Cuda</a>
+      <a href="https://dobynsrods.com/" target="_blank" rel="noopener noreferrer">Dobyns Rods</a>
+      <a href="https://www.northlandtackle.com/" target="_blank" rel="noopener noreferrer">Northland Fishing Tackle</a>
+      <a href="https://www.phenixrods.com/" target="_blank" rel="noopener noreferrer">Phenix Rods</a>
+      <a href="https://www.roboworm.com/" target="_blank" rel="noopener noreferrer">Roboworm</a>
+      <a href="https://boneheadtackle.com/" target="_blank" rel="noopener noreferrer">Bonehead Tackle</a>
+      <a href="https://buckeyelures.com/" target="_blank" rel="noopener noreferrer">Buckeye Lures</a>
+      <a href="https://steelshad.com/" target="_blank" rel="noopener noreferrer">SteelShad</a>
+      <a href="https://www.stopperlures.com/" target="_blank" rel="noopener noreferrer">Stopper Lures</a>
+      <a href="https://www.yamamoto.fish/" target="_blank" rel="noopener noreferrer">Yamamoto Baits</a>
+    </div>
+
+    <div class="collapsible-header" data-target="general-outdoors-links">
+      <span>General Outdoors & Accessories</span>
+      <span class="arrow">&gt;</span>
+    </div>
+    <div id="general-outdoors-links" class="collapsible-content">
+      <a href="https://www.goutdoorsproducts.com/" target="_blank" rel="noopener noreferrer">G-Outdoors Products</a>
+      <a href="https://tekmat.com/" target="_blank" rel="noopener noreferrer">TekMat</a>
+      <a href="https://www.vikingsl.com/" target="_blank" rel="noopener noreferrer">Viking Solutions</a>
+      <a href="https://www.hmeproducts.com/" target="_blank" rel="noopener noreferrer">HME Products (Hunting Made Easy)</a>
+    </div>
+  </nav>
+
+  <div id="overlay"></div>
+
+  <div id="main-container" class="max-w-2xl mx-auto p-4">
+    <div class="flex items-center mb-4">
+      <div id="hamburger-menu-left" class="hamburger-menu mr-4">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+      <h1 class="text-2xl font-bold text-center flex-grow">GSM Customer Service Knowledge Base</h1>
+      <div id="hamburger-menu-right" class="hamburger-menu ml-4">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+    </div>
+    <form id="chat-form" class="mb-4" autocomplete="off">
+      <input
+        id="user-input"
+        type="text"
+        placeholder="Search for answers..."
+        autocomplete="off"
+        class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring bg-transparent border-gray-300 focus:ring-blue-500 placeholder-gray-500"
+      />
+    </form>
+
+    <div id="partial-results" class="space-y-2"></div>
+  </div>
+
+  <div id="answer-container" class="hidden">
+    <button id="back-button" class="mb-6 text-blue-600 hover:underline transition-colors duration-300">&larr; Back to Search</button>
+    <div id="full-answer" class="prose max-w-full"></div>
+  </div>
+
+<script>
+  const knowledgeBase = [
+    {
+      question: "RMA Regular process",
+      answer: `
+      <h2 class="text-xl font-semibold text-blue-700 mb-2">RMA Regular process</h2>
+      <ol class="list-decimal list-inside text-gray-800">
+        <li>If item is in stock:
+          <table class="table-auto border border-gray-300 my-2 text-sm w-full">
+            <thead>
+              <tr class="bg-blue-600 text-white">
+                <th class="border px-2 py-1">Step</th>
+                <th class="border px-2 py-1">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="bg-blue-50">
+                <td class="border px-2 py-1 font-semibold text-blue-700">1</td>
+                <td class="border px-2 py-1"><ul class="list-disc list-inside ml-4"><li><strong>Proceed by asking for Pic and Pop.</strong></li></ul></td>
+              </tr>
+              <tr>
+                <td class="border px-2 py-1 font-semibold text-blue-700">2</td>
+                <td class="border px-2 py-1"><ul class="list-disc list-inside ml-4">
+                  <li><strong>If the customer can't provide Pic and Pop during the call, delay resolution.</strong></li>
+                  <li><strong>Make sure to create the RMA once Pic and Pop are provided.</strong></li>
+                  <li><strong>Then proceed to the closing spiel.</strong></li>
+                </ul></td>
+              </tr>
+              <tr class="bg-blue-50">
+                <td class="border px-2 py-1 font-semibold text-blue-700">3</td>
+                <td class="border px-2 py-1"><ul class="list-disc list-inside ml-4">
+                  <li><strong>If Pic and Pop are provided during the call, create RMA and send an email for the return process.</strong></li>
+                </ul></td>
+              </tr>
+            </tbody>
+          </table>
+        </li>
+        <li>If item is out of stock:
+          <table class="table-auto border border-gray-300 my-2 text-sm w-full">
+            <tbody>
+              <tr class="bg-blue-50">
+                <td class="border px-2 py-1 font-semibold text-blue-700">1</td>
+                <td class="border px-2 py-1"><strong>Check for a comparable item and follow the same steps above.</strong></td>
+              </tr>
+            </tbody>
+          </table>
+        </li>
+        <li>Notes:
+          <ul class="list-disc list-inside ml-6 text-gray-700 mt-1">
+            <li><strong>Always create internal notes.</strong></li>
+            <li><strong>Before the closing spiel (if the customer is resolved), don't forget to offer hot deals.</strong></li>
+          </ul>
+        </li>
+      </ol>`
+    },
+    {
+      question: "RMA DEFNR",
+      answer: `
+      <h2 class="text-xl font-semibold text-green-700 mb-2">RMA DEFNR</h2>
+      <ol class="list-decimal list-inside text-gray-800">
+        <li><strong>Note:</strong> Only applicable if the item weighs 50 lbs or more.</li>
+        <li>If item is in stock:
+          <table class="table-auto border border-gray-300 my-2 text-sm w-full">
+            <thead>
+              <tr class="bg-blue-600 text-white">
+                <th class="border px-2 py-1">Step</th>
+                <th class="border px-2 py-1">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="bg-blue-50">
+                <td class="border px-2 py-1 font-semibold text-green-700">1</td>
+                <td class="border px-2 py-1">
+                  <ul class="list-disc list-inside ml-4">
+                    <li><strong>Ask for Pic and Pop.</strong></li>
+                    <li><strong>If not provided during the call, delay resolution and create the RMA DEFNR once provided.</strong></li>
+                    <li><strong>Then proceed to the closing spiel.</strong></li>
+                  </ul>
+                </td>
+              </tr>
+              <tr>
+                <td class="border px-2 py-1 font-semibold text-green-700">2</td>
+                <td class="border px-2 py-1">
+                  <ul class="list-disc list-inside ml-4">
+                    <li><strong>If Pic and Pop are provided during the call:</strong></li>
+                    <li>Submit for approval (required for DEFNR).</li>
+                    <li>If approved:
+                      <ul class="list-disc list-inside ml-6">
+                        <li>Create the RMA, set Location to DEFNR, Reason Code to DEFNR.</li>
+                        <li>Create new order with 100% discount, copy CRMSO number, and note.</li>
+                        <li>Update RMA with CRMSO, submit, and email customer with both numbers.</li>
+                      </ul>
+                    </li>
+                  </ul>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </li>
+        <li>Notes:
+          <ul class="list-disc list-inside ml-6 text-gray-700 mt-1">
+            <li><strong>Always create internal notes.</strong></li>
+            <li><strong>Before the closing spiel (if resolved), offer hot deals.</strong></li>
+          </ul>
+        </li>
+      </ol>`
+    },
+    {
+      question: "Creating return label",
+      answer: `
+      <h2 class="text-xl font-semibold text-purple-700 mb-2">Creating return label</h2>
+      <ol class="list-decimal list-inside text-gray-800 space-y-1">
+        <li>
+          <table class="table-auto border border-gray-300 my-2 text-sm w-full">
+            <thead>
+              <tr class="bg-blue-600 text-white">
+                <th class="border px-2 py-1">Step</th>
+                <th class="border px-2 py-1">Details</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="bg-blue-50">
+                <td class="border px-2 py-1 font-semibold text-purple-700">1</td>
+                <td class="border px-2 py-1"><strong>Go to <a href="https://www.fedex.com/secure-login/en-ph/#/credentials" class="text-blue-600 underline" target="_blank" rel="noopener noreferrer">FedEx Login</a>.</strong></td>
+              </tr>
+              <tr>
+                <td class="border px-2 py-1 font-semibold text-purple-700">2</td>
+                <td class="border px-2 py-1"><strong>Login credentials:</strong>
+                  <ul class="list-disc list-inside ml-4">
+                    <li><strong>Username:</strong> GSMINC1</li>
+                    <li><strong>Password:</strong> Gsminc2023!!</li>
+                  </ul>
+                </td>
+              </tr>
+              <tr class="bg-blue-50">
+                <td class="border px-2 py-1 font-semibold text-purple-700">3</td>
+                <td class="border px-2 py-1"><strong>Change shipment to Return Shipment under Outbound shipment dropdown.</strong></td>
+              </tr>
+              <tr>
+                <td class="border px-2 py-1 font-semibold text-purple-700">4</td>
+                <td class="border px-2 py-1"><strong>Deliver To:</strong>
+                  <ul class="list-disc list-inside ml-4">
+                    <li>Search "FRYE RETURNS" in address book</li>
+                    <li>Contact: FRYE RETURNS | Phone: 8772698490</li>
+                    <li>Address: 5250 FRYE RD IRVING, TX 75061 US</li>
+                  </ul>
+                </td>
+              </tr>
+              <tr class="bg-blue-50">
+                <td class="border px-2 py-1 font-semibold text-purple-700">5</td>
+                <td class="border px-2 py-1"><strong>Return From:</strong> Enter customer’s name, number, and address.</td>
+              </tr>
+              <tr>
+                <td class="border px-2 py-1 font-semibold text-purple-700">6</td>
+                <td class="border px-2 py-1"><strong>Package Details:</strong> Your packaging, 1 package, 10 lbs</td>
+              </tr>
+              <tr class="bg-blue-50">
+                <td class="border px-2 py-1 font-semibold text-purple-700">7</td>
+                <td class="border px-2 py-1"><strong>Return Service:</strong> FedEx Ground</td>
+              </tr>
+              <tr>
+                <td class="border px-2 py-1 font-semibold text-purple-700">8</td>
+                <td class="border px-2 py-1"><strong>Return Options:</strong> Put the RMA number</td>
+              </tr>
+              <tr class="bg-blue-50">
+                <td class="border px-2 py-1 font-semibold text-purple-700">9</td>
+                <td class="border px-2 py-1"><strong>Click Finalize</strong>, copy tracking number, and click Download.</td>
+              </tr>
+            </tbody>
+          </table>
+        </li>
+      </ol>`
+    },
+    {
+      question: "Creating Contact Card",
+      answer: `
+      <h2 class="text-xl font-semibold text-indigo-700 mb-2">Creating Contact Card</h2>
+      <ol class="list-decimal list-inside text-gray-800 space-y-1">
+        <li>
+          <table class="table-auto border border-gray-300 my-2 text-sm w-full">
+            <thead>
+              <tr class="bg-blue-600 text-white">
+                <th class="border px-2 py-1">Step</th>
+                <th class="border px-2 py-1">Action/Section</th>
+                <th class="border px-2 py-1">Details</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="bg-blue-50">
+                <td class="border px-2 py-1 font-semibold text-indigo-700">1</td>
+                <td class="border px-2 py-1">Navigation</td>
+                <td class="border px-2 py-1">Select <strong>"Contact"</strong> on the left in the side panel under <strong>"Customer"</strong> then select <strong>"+ New"</strong>.</td>
+              </tr>
+              <tr>
+                <td class="border px-2 py-1 font-semibold text-indigo-700">2</td>
+                <td class="border px-2 py-1">General Section</td>
+                <td class="border px-2 py-1"><strong>Note:</strong> Anything with red (*) must be filled or it won't save.
+                  <ul class="list-disc list-inside ml-4">
+                    <li>First Name</li>
+                    <li>Last Name</li>
+                    <li>Customer: "10081" select "Consumer GSM"</li>
+                    <li>Email</li>
+                    <li>Mobile Phone</li>
+                    <li>Street Address</li>
+                    <li>Zip Code</li>
+                  </ul>
+                </td>
+              </tr>
+              <tr class="bg-blue-50">
+                <td class="border px-2 py-1 font-semibold text-indigo-700">3</td>
+                <td class="border px-2 py-1">Save</td>
+                <td class="border px-2 py-1">Click <strong>"Save"</strong>.</td>
+              </tr>
+              <tr>
+                <td class="border px-2 py-1 font-semibold text-indigo-700">4</td>
+                <td class="border px-2 py-1">Timeline</td>
+                <td class="border px-2 py-1">
+                  <ul class="list-disc list-inside ml-4">
+                    <li>Double click in the <em>"Enter a Note"</em></li>
+                    <li>Who, What, What (Note Content)</li>
+                    <li>Click <strong>"Add note and close"</strong></li>
+                  </ul>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </li>
+      </ol>`
+    },
+    {
+      question: "Process to Add Credit Card Info",
+      answer: `
+      <h2 class="text-xl font-semibold text-red-700 mb-2">Process to Add Credit Card Info</h2>
+      <ol class="list-decimal list-inside text-gray-800 space-y-1">
+        <li>
+          <table class="table-auto border border-gray-300 my-2 text-sm w-full">
+            <thead>
+              <tr class="bg-blue-600 text-white">
+                <th class="border px-2 py-1">Step</th>
+                <th class="border px-2 py-1">Section/Field</th>
+                <th class="border px-2 py-1">Details</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="bg-blue-50">
+                <td class="border px-2 py-1 font-semibold text-red-700">1</td>
+                <td class="border px-2 py-1">Navigation</td>
+                <td class="border px-2 py-1">Select <strong>"Credit Card"</strong> on the top task bar in the Contact Card.</td>
+              </tr>
+              <tr>
+                <td class="border px-2 py-1 font-semibold text-red-700">2</td>
+                <td class="border px-2 py-1">General Selection</td>
+                <td class="border px-2 py-1">Showing customer's name.</td>
+              </tr>
+              <tr class="bg-blue-50">
+                <td class="border px-2 py-1 font-semibold text-red-700">3</td>
+                <td class="border px-2 py-1">Credit Card Info</td>
+                <td class="border px-2 py-1"><strong>Note: Never repeat any of the Credit Card Info</strong>
+                  <ul class="list-disc list-inside ml-4">
+                    <li>Payment Gateway Type: Pay Flow</li>
+                    <li>Card Type: Enter Type of Card (If it's Mastercard etc) (DO NOT REPEAT)</li>
+                    <li>Card Number: Enter card number (DO NOT REPEAT)</li>
+                    <li>Exp. Month: 2 digit month (DO NOT REPEAT)</li>
+                    <li>Exp. Year: 4 digit year (DO NOT REPEAT)</li>
+                    <li>Authorization: Pay Flow</li>
+                  </ul>
+                </td>
+              </tr>
+              <tr>
+                <td class="border px-2 py-1 font-semibold text-red-700">4</td>
+                <td class="border px-2 py-1">Billing Section</td>
+                <td class="border px-2 py-1">Always verify the address for the card. If billing address is different, add it here.</td>
+              </tr>
+              <tr class="bg-blue-50">
+                <td class="border px-2 py-1 font-semibold text-red-700">5</td>
+                <td class="border px-2 py-1">Save</td>
+                <td class="border px-2 py-1">Click <strong>"Save"</strong>.</td>
+              </tr>
+            </tbody>
+          </table>
+        </li>
+      </ol>`
+    },
+    {
+      question: "Process to locate Contact Card",
+      answer: `
+      <h2 class="text-xl font-semibold text-yellow-700 mb-2">Process to locate Contact Card</h2>
+      <ol class="list-decimal list-inside text-gray-800 space-y-1">
+        <li>
+          <table class="table-auto border border-gray-300 my-2 text-sm w-full">
+            <thead>
+              <tr class="bg-blue-600 text-white">
+                <th class="border px-2 py-1">Step</th>
+                <th class="border px-2 py-1">Action/Details</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="bg-blue-50">
+                <td class="border px-2 py-1">Select <strong>"Contact"</strong> on the left in the side panel under <strong>"Customer"</strong>.</td>
+              </tr>
+              <tr>
+                <td class="border px-2 py-1">Select <strong>"All Contact"</strong>
+                  <ul class="list-disc list-inside ml-4">
+                    <li>Click <strong>"Full Name"</strong></li>
+                    <li>Click <strong>"Filter"</strong></li>
+                    <li>Insert <strong>"First & Last Name"</strong></li>
+                    <li>Click <strong>"Apply"</strong></li>
+                  </ul>
+                </td>
+              </tr>
+              <tr class="bg-blue-50">
+                <td class="border px-2 py-1">If the customer has called before, the Contact Card will generate. Click it and verify all information.</td>
+              </tr>
+              <tr>
+                <td class="border px-2 py-1">If Contact Card does not show up, we need to create a <strong>"New Contact Card"</strong>.</td>
+              </tr>
+            </tbody>
+          </table>
+        </li>
+      </ol>`
+    },
+    {
+      question: "Process to Create Return Autorization (RMA)",
+      answer: `
+      <h2 class="text-xl font-semibold text-green-800 mb-2">Process to create Return Authorization (RMA)</h2>
+      <ol class="list-decimal list-inside text-gray-800 space-y-1">
+        <li>
+          <table class="table-auto border border-gray-300 my-2 text-sm w-full">
+            <thead>
+              <tr class="bg-blue-600 text-white">
+                <th class="border px-2 py-1">Step</th>
+                <th class="border px-2 py-1">Section</th>
+                <th class="border px-2 py-1">Details</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="bg-blue-50">
+                <td class="border px-2 py-1 font-semibold text-green-800">1</td>
+                <td class="border px-2 py-1">Navigation</td>
+                <td class="border px-2 py-1">Select <strong>"Sales Return"</strong> on the left in the side panel under <strong>"Order Processing"</strong>. Then select <strong>"+ New"</strong>.</td>
+              </tr>
+              <tr>
+                <td class="border px-2 py-1 font-semibold text-green-800">2</td>
+                <td class="border px-2 py-1">General Section</td>
+                <td class="border px-2 py-1">
+                  <ul class="list-disc list-inside ml-4">
+                    <li>Customer: "10081" select "Consumer GSM"</li>
+                    <li>Contact Name: Type in the "Customer Name", then select the name.</li>
+                    <li>External Document No.:
+                      <ul class="list-circle list-inside ml-4">
+                        <li>Purchased through 3rd party dealer: Use First name, Last name Initial followed by month & date.</li>
+                        <li>Purchased directly from GSM website or phone: Use Web order number or SO number followed by RE (SO+RE or WEB# + RE).</li>
+                      </ul>
+                    </li>
+                  </ul>
+                </td>
+              </tr>
+              <tr class="bg-blue-50">
+                <td class="border px-2 py-1 font-semibold text-green-800">3</td>
+                <td class="border px-2 py-1">Save & Populate</td>
+                <td class="border px-2 py-1">Click <strong>"Save"</strong>. Once saved, customer info will generate and the Return Line will populate.</td>
+              </tr>
+              <tr>
+                <td class="border px-2 py-1 font-semibold text-green-800">4</td>
+                <td class="border px-2 py-1">Return Line</td>
+                <td class="border px-2 py-1">
+                  <ul class="list-disc list-inside ml-4">
+                    <li>Select <strong>"+ New Sales Return Line"</strong></li>
+                    <li>Type: Item</li>
+                    <li>Product: SKU number of item</li>
+                    <li>Unit Price Excl. Tax: $0.00</li>
+                    <li>Quantity: # of items returning</li>
+                    <li>Location: Frye</li>
+                    <li>Return Reason Code: MSC-Warranty</li>
+                    <li>Click <strong>"Save and Close"</strong></li>
+                  </ul>
+                </td>
+              </tr>
+              <tr class="bg-blue-50">
+                <td class="border px-2 py-1 font-semibold text-green-800">5</td>
+                <td class="border px-2 py-1">Timeline</td>
+                <td class="border px-2 py-1">
+                  <ul class="list-disc list-inside ml-4">
+                    <li>Double click in the "Enter a Note"</li>
+                    <li>Who, What, What (Note Content)</li>
+                    <li>Click "Add note and close"</li>
+                  </ul>
+                </td>
+              </tr>
+              <tr>
+                <td class="border px-2 py-1 font-semibold text-green-800">6</td>
+                <td class="border px-2 py-1">Submit</td>
+                <td class="border px-2 py-1">Click <strong>"Submit Return"</strong>.</td>
+              </tr>
+            </tbody>
+          </table>
+        </li>
+      </ol>`
+    },
+    {
+      question: "Process to create RMA w/ Replacement",
+      answer: `
+      <h2 class="text-xl font-semibold text-pink-700 mb-2">Process to create RMA w/ Replacement</h2>
+      <ol class="list-decimal list-inside text-gray-800 space-y-1">
+        <li>
+          <table class="table-auto border border-gray-300 my-2 text-sm w-full">
+            <thead>
+              <tr class="bg-blue-600 text-white">
+                <th class="border px-2 py-1">Step</th>
+                <th class="border px-2 py-1">Section</th>
+                <th class="border px-2 py-1">Details</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="bg-blue-50">
+                <td class="border px-2 py-1 font-semibold text-pink-700">1</td>
+                <td class="border px-2 py-1">Navigation</td>
+                <td class="border px-2 py-1">Select <strong>"Sales Return"</strong> on the left in the side panel under <strong>"Order Processing"</strong>. Then select <strong>"+ New"</strong>.</td>
+              </tr>
+              <tr>
+                <td class="border px-2 py-1 font-semibold text-pink-700">2</td>
+                <td class="border px-2 py-1">General Section</td>
+                <td class="border px-2 py-1">
+                  <ul class="list-disc list-inside ml-4">
+                    <li>Customer: "10081" select "Consumer GSM"</li>
+                    <li>Contact Name: Type in the "Customer Name", then select the name.</li>
+                    <li>External Document No.:
+                      <ul class="list-circle list-inside ml-4">
+                        <li>Purchased through 3rd party dealer: Use First name, Last name Initial followed by month & date.</li>
+                        <li>Purchased directly from GSM website or phone: Use Web order number or SO number followed by RE.</li>
+                      </ul>
+                    </li>
+                  </ul>
+                </td>
+              </tr>
+              <tr class="bg-blue-50">
+                <td class="border px-2 py-1 font-semibold text-pink-700">3</td>
+                <td class="border px-2 py-1">Save & Populate</td>
+                <td class="border px-2 py-1">Click <strong>"Save"</strong>. Once saved, customer info will generate and Return Line will populate.</td>
+              </tr>
+              <tr>
+                <td class="border px-2 py-1 font-semibold text-pink-700">4</td>
+                <td class="border px-2 py-1">Return Line (Original Item)</td>
+                <td class="border px-2 py-1">
+                  <ul class="list-disc list-inside ml-4">
+                    <li>Select <strong>"+ New Sales Return Line"</strong></li>
+                    <li>Type: Item</li>
+                    <li>Product: SKU number of item</li>
+                    <li>Unit Price Excl. Tax: $0.00</li>
+                    <li>Quantity: # of items returning</li>
+                    <li>Location: Frye</li>
+                    <li>Return Reason Code: MSC-Warranty</li>
+                    <li>Click <strong>"Save & Close"</strong></li>
+                  </ul>
+                </td>
+              </tr>
+              <tr class="bg-blue-50">
+                <td class="border px-2 py-1 font-semibold text-pink-700">5</td>
+                <td class="border px-2 py-1">Return Line (Replacement Comment)</td>
+                <td class="border px-2 py-1">
+                  <ul class="list-disc list-inside ml-4">
+                    <li>Select <strong>"+ New Sales Return Line"</strong></li>
+                    <li>Type: Comment</li>
+                    <li>Description: Replace w/ SKU number. Example: replace w/STC-BT16 (Replacement SKU)</li>
+                    <li>Click <strong>"Save & Close"</strong></li>
+                  </ul>
+                </td>
+              </tr>
+              <tr>
+                <td class="border px-2 py-1 font-semibold text-pink-700">6</td>
+                <td class="border px-2 py-1">Timeline</td>
+                <td class="border px-2 py-1">
+                  <ul class="list-disc list-inside ml-4">
+                    <li>Double click in the "Enter a Note"</li>
+                    <li>Who, What, What (Note Content)</li>
+                    <li>Click "Add note and close"</li>
+                  </ul>
+                </td>
+              </tr>
+              <tr class="bg-blue-50">
+                <td class="border px-2 py-1 font-semibold text-pink-700">7</td>
+                <td class="border px-2 py-1">Submit</td>
+                <td class="border px-2 py-1">Click <strong>"Submit Return"</strong>.</td>
+              </tr>
+            </tbody>
+          </table>
+        </li>
+      </ol>`
+    },
+    {
+      question: "Shipping codes for US",
+      answer: `
+      <h2 class="text-xl font-semibold text-gray-700 mb-2">Shipping codes for US</h2>
+      <table class="table-auto border border-gray-300 my-2 text-sm w-full">
+        <thead>
+          <tr class="bg-blue-600 text-white">
+            <th class="border px-2 py-1">Code</th>
+            <th class="border px-2 py-1">Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="bg-blue-50">
+            <td class="border px-2 py-1 font-semibold text-gray-700">SS1</td>
+            <td class="border px-2 py-1">Standard shipping</td>
+          </tr>
+          <tr>
+            <td class="border px-2 py-1 font-semibold text-gray-700">S05</td>
+            <td class="border px-2 py-1">1-5 LBS</td>
+          </tr>
+          <tr class="bg-blue-50">
+            <td class="border px-2 py-1 font-semibold text-gray-700">S10</td>
+            <td class="border px-2 py-1">5.1-10.0 LBS</td>
+          </tr>
+          <tr>
+            <td class="border px-2 py-1 font-semibold text-gray-700">S15</td>
+            <td class="border px-2 py-1">10.1-15.0 LBS</td>
+          </tr>
+          <tr class="bg-blue-50">
+            <td class="border px-2 py-1 font-semibold text-gray-700">S20</td>
+            <td class="border px-2 py-1">15.1-20.0 LBS</td>
+          </tr>
+          <tr>
+            <td class="border px-2 py-1 font-semibold text-gray-700">S25</td>
+            <td class="border px-2 py-1">20.1-25.0 LBS</td>
+          </tr>
+          <tr class="bg-blue-50">
+            <td class="border px-2 py-1 font-semibold text-gray-700">S30</td>
+            <td class="border px-2 py-1">25.1-30.0 LBS</td>
+          </tr>
+          <tr>
+            <td class="border px-2 py-1 font-semibold text-gray-700">S35</td>
+            <td class="border px-2 py-1">30.1-35.0 LBS</td>
+          </tr>
+          <tr class="bg-blue-50">
+            <td class="border px-2 py-1 font-semibold text-gray-700">S40</td>
+            <td class="border px-2 py-1">35.1-40.0 LBS</td>
+          </tr>
+          <tr>
+            <td class="border px-2 py-1 font-semibold text-gray-700">S45</td>
+            <td class="border px-2 py-1">40.1-45.0 LBS</td>
+          </tr>
+          <tr class="bg-blue-50">
+            <td class="border px-2 py-1 font-semibold text-gray-700">S50</td>
+            <td class="border px-2 py-1">45.1-50.0 LBS</td>
+          </tr>
+        </tbody>
+      </table>`
+    },
+    {
+      question: "Shipping codes for Canada",
+      answer: `
+      <h2 class="text-xl font-semibold text-gray-700 mb-2">Shipping codes for Canada</h2>
+      <table class="table-auto border border-gray-300 my-2 text-sm w-full">
+        <thead>
+          <tr class="bg-blue-600 text-white">
+            <th class="border px-2 py-1">Code</th>
+            <th class="border px-2 py-1">Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="bg-blue-50">
+            <td class="border px-2 py-1 font-semibold text-gray-700">SS1E</td>
+            <td class="border px-2 py-1">STANDARD INTERNATIONAL SHIPPING</td>
+          </tr>
+          <tr>
+            <td class="border px-2 py-1 font-semibold text-gray-700">SS2E</td>
+            <td class="border px-2 py-1">CANADIAN SHIPPNG OVER 1LB</td>
+          </tr>
+          <tr class="bg-blue-50">
+            <td class="border px-2 py-1 font-semibold text-gray-700">SS3E</td>
+            <td class="border px-2 py-1">CANADIAN SHIPPING 2-3.9#</td>
+          </tr>
+          <tr>
+            <td class="border px-2 py-1 font-semibold text-gray-700">SS4E</td>
+            <td class="border px-2 py-1">CANADIAN SHIPPING 4-5.9#</td>
+          </tr>
+        </tbody>
+      </table>`
+    },
+    {
+      question: "Shipping code for set shipping rate",
+      answer: `
+      <h2 class="text-xl font-semibold text-gray-700 mb-2">Shipping code for set shipping rate</h2>
+      <table class="table-auto border border-gray-300 my-2 text-sm w-full">
+        <thead>
+          <tr class="bg-blue-600 text-white">
+            <th class="border px-2 py-1">Code</th>
+            <th class="border px-2 py-1">Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="bg-blue-50">
+            <td class="border px-2 py-1 font-semibold text-gray-700">ESQ</td>
+            <td class="border px-2 py-1">Shipping Charges</td>
+          </tr>
+        </tbody>
+      </table>`
+    },
+    {
+      question: "Process to Create No Cost Order",
+      answer: `
+      <h2 class="text-xl font-semibold text-gray-700 mb-2">Process to Create No Cost Order</h2>
+      <h3 class="text-lg font-medium text-gray-600 mb-1">Step by Step process</h3>
+      <ol class="list-decimal list-inside text-gray-800 space-y-1">
+        <li>
+          <table class="table-auto border border-gray-300 my-2 text-sm w-full">
+            <thead>
+              <tr class="bg-blue-600 text-white">
+                <th class="border px-2 py-1">Step</th>
+                <th class="border px-2 py-1">Section/Field</th>
+                <th class="border px-2 py-1">Details</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="bg-blue-50">
+                <td class="border px-2 py-1 font-semibold text-gray-700">1</td>
+                <td class="border px-2 py-1">Navigation</td>
+                <td class="border px-2 py-1">Select <strong>"Orders"</strong> on the left in the side panel under <strong>"Order Processing"</strong>. Then select <strong>"+ New"</strong>.</td>
+              </tr>
+              <tr>
+                <td class="border px-2 py-1 font-semibold text-gray-700">2</td>
+                <td class="border px-2 py-1">Summary Section</td>
+                <td class="border px-2 py-1">
+                  <ul class="list-disc list-inside ml-4">
+                    <li>Customer: <strong>"10081"</strong> select <strong>"Consumer GSM"</strong></li>
+                    <li>Contact No: Type in the <strong>"Customer Name"</strong>, then select the name.</li>
+                    <li>External Doc No: <strong>RMA number or previous sales order number followed by RE</strong></li>
+                    <li>Shipment Date: Set 3 business days out. Do not include weekends or holidays.</li>
+                    <li>Campaign No: <strong>GT- Customer Service</strong></li>
+                    <li>Location Code: <strong>ROC</strong></li>
+                    <li>Payment Terms Code: <strong>EX= Exchange</strong></li>
+                    <li>Payment Method Code: <strong>EX= Exchange</strong></li>
+                    <li>Shipping Method: <strong>USPS</strong></li>
+                  </ul>
+                </td>
+              </tr>
+              <tr class="bg-blue-50">
+                <td class="border px-2 py-1 font-semibold text-gray-700">3</td>
+                <td class="border px-2 py-1">Save & Populate</td>
+                <td class="border px-2 py-1">Select <strong>"Save"</strong>. Once saved the Product Line will generate.</td>
+              </tr>
+              <tr>
+                <td class="border px-2 py-1 font-semibold text-gray-700">4</td>
+                <td class="border px-2 py-1">Billing and Shipping Address</td>
+                <td class="border px-2 py-1">Confirm customer address in billing & shipping.</td>
+              </tr>
+              <tr class="bg-blue-50">
+                <td class="border px-2 py-1 font-semibold text-gray-700">5</td>
+                <td class="border px-2 py-1">Product Line</td>
+                <td class="border px-2 py-1">
+                  <ul class="list-disc list-inside ml-4">
+                    <li>Select <strong>"+ Add Product"</strong></li>
+                    <li>Existing Product: Add sku #</li>
+                    <li>Pricing: Turn toggle on</li>
+                    <li>Price Per Unit: Price of the item</li>
+                    <li>Quantity: # of items purchasing</li>
+                    <li>Select <strong>"Save & Close"</strong></li>
+                  </ul>
+                </td>
+              </tr>
+              <tr>
+                <td class="border px-2 py-1 font-semibold text-gray-700">6</td>
+                <td class="border px-2 py-1">Timeline</td>
+                <td class="border px-2 py-1">
+                  <ul class="list-disc list-inside ml-4">
+                    <li>Double click in the <em>"Enter a Note"</em></li>
+                    <li>Who, What, What (Note Content)</li>
+                    <li>Click <strong>"Add note and close"</strong></li>
+                  </ul>
+                </td>
+              </tr>
+              <tr class="bg-blue-50">
+                <td class="border px-2 py-1 font-semibold text-gray-700">7</td>
+                <td class="border px-2 py-1">Submit Order</td>
+                <td class="border px-2 py-1">Click <strong>"Submit Order"</strong>.</td>
+              </tr>
+            </tbody>
+          </table>
+        </li>
+      </ol>`
+    },
+    {
+      question: "Process to create Sample Order",
+      answer: `
+      <h2 class="text-xl font-semibold text-gray-700 mb-2">Process to create Sample Order</h2>
+      <h3 class="text-lg font-medium text-gray-600 mb-1">Step by Step process</h3>
+      <p class="text-gray-800">Note: This is only applicable if the item is below 20lbs</p>
+      <ol class="list-decimal list-inside text-gray-800 space-y-1">
+        <li>
+          <table class="table-auto border border-gray-300 my-2 text-sm w-full">
+            <thead>
+              <tr class="bg-blue-600 text-white">
+                <th class="border px-2 py-1">Step</th>
+                <th class="border px-2 py-1">Section/Field</th>
+                <th class="border px-2 py-1">Details</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="bg-blue-50">
+                <td class="border px-2 py-1 font-semibold text-gray-700">1</td>
+                <td class="border px-2 py-1">Navigation</td>
+                <td class="border px-2 py-1">Select <strong>"Orders"</strong> on the left in the side panel under <strong>"Order Processing"</strong>. Then select <strong>"+ New"</strong>.</td>
+              </tr>
+              <tr>
+                <td class="border px-2 py-1 font-semibold text-gray-700">2</td>
+                <td class="border px-2 py-1">Summary Section</td>
+                <td class="border px-2 py-1">
+                  <ul class="list-disc list-inside ml-4">
+                    <li>Customer: <strong>"10279"</strong> select <strong>"Sample"</strong></li>
+                    <li>Contact No: Type in the <strong>"Sample"</strong>, then select the <strong>"Sample"</strong> or <strong>"Sample Contact"</strong>.</li>
+                    <li>External Doc No: Use First name, Last name Initial followed by month & date</li>
+                    <li>Shipment Date: Set 3 business days out. Do not include weekends or holidays.</li>
+                    <li>Campaign No: <strong>GT- Customer Service</strong></li>
+                    <li>Location Code: <strong>ROC</strong></li>
+                    <li>Payment Terms Code: <strong>EX= Exchange</strong></li>
+                    <li>Payment Method Code: <strong>EX= Exchange</strong></li>
+                    <li>Shipping Method: <strong>USPS</strong></li>
+                  </ul>
+                </td>
+              </tr>
+              <tr class="bg-blue-50">
+                <td class="border px-2 py-1 font-semibold text-gray-700">3</td>
+                <td class="border px-2 py-1">Save & Populate</td>
+                <td class="border px-2 py-1">Select <strong>"Save"</strong>. Once saved, the Billing and Shipping/Product Line will generate.</td>
+              </tr>
+              <tr>
+                <td class="border px-2 py-1 font-semibold text-gray-700">4</td>
+                <td class="border px-2 py-1">Billing & Shipping</td>
+                <td class="border px-2 py-1">Add customer address to the billing & shipping sections.</td>
+              </tr>
+              <tr class="bg-blue-50">
+                <td class="border px-2 py-1 font-semibold text-gray-700">5</td>
+                <td class="border px-2 py-1">Product Line</td>
+                <td class="border px-2 py-1">
+                  <ul class="list-disc list-inside ml-4">
+                    <li>Select <strong>"+ Add Product"</strong></li>
+                    <li>Product: Add sku #</li>
+                    <li>Pricing: Leave off</li>
+                    <li>Price Per Unit: $0.00</li>
+                    <li>Quantity: # of items</li>
+                    <li>Manual Discount %: 100</li>
+                    <li>Select <strong>"Save & Close"</strong></li>
+                  </ul>
+                </td>
+              </tr>
+              <tr>
+                <td class="border px-2 py-1 font-semibold text-gray-700">6</td>
+                <td class="border px-2 py-1">Timeline</td>
+                <td class="border px-2 py-1">
+                  <ul class="list-disc list-inside ml-4">
+                    <li>Double click in the <em>"Enter a Note"</em></li>
+                    <li>Who, What, What (Note Content)</li>
+                    <li>Click <strong>"Add note and close"</strong></li>
+                  </ul>
+                </td>
+              </tr>
+              <tr class="bg-blue-50">
+                <td class="border px-2 py-1 font-semibold text-gray-700">7</td>
+                <td class="border px-2 py-1">Submit Order</td>
+                <td class="border px-2 py-1">Click <strong>"Submit Order"</strong>.</td>
+              </tr>
+            </tbody>
+          </table>
+        </li>
+      </ol>`
+    },
+    {
+      question: "Process to Create Canadian RMA-DEFNR",
+      answer: `
+      <h2 class="text-xl font-semibold text-gray-700 mb-2">Process to Create Canadian RMA-DEFNR</h2>
+      <h3 class="text-lg font-medium text-gray-600 mb-1">Step by Step process</h3>
+      <ol class="list-decimal list-inside text-gray-800 space-y-1">
+        <li>
+          <table class="table-auto border border-gray-300 my-2 text-sm w-full">
+            <thead>
+              <tr class="bg-blue-600 text-white">
+                <th class="border px-2 py-1">Step</th>
+                <th class="border px-2 py-1">Section/Field</th>
+                <th class="border px-2 py-1">Details</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="bg-blue-50">
+                <td class="border px-2 py-1 font-semibold text-gray-700">1</td>
+                <td class="border px-2 py-1">Navigation</td>
+                <td class="border px-2 py-1">Select <strong>"Sales Return"</strong> on the left in the side panel under <strong>"Order Processing"</strong>. Then select <strong>"+ New"</strong>.</td>
+              </tr>
+              <tr>
+                <td class="border px-2 py-1 font-semibold text-gray-700">2</td>
+                <td class="border px-2 py-1">General Section</td>
+                <td class="border px-2 py-1">
+                  <ul class="list-disc list-inside ml-4">
+                    <li>Customer: <strong>"10081"</strong> select <strong>"Consumer GSM"</strong></li>
+                    <li>Contact Name: Type in the <strong>"Customer Name"</strong>, then select the name.</li>
+                    <li>External Document No: Purchased through 3rd party dealer. First name, Last name Initial followed by month & date.</li>
+                  </ul>
+                </td>
+              </tr>
+              <tr class="bg-blue-50">
+                <td class="border px-2 py-1 font-semibold text-gray-700">3</td>
+                <td class="border px-2 py-1">Save & Populate</td>
+                <td class="border px-2 py-1">Click <strong>"Save"</strong>. Once <strong>"Saved"</strong>, the customer information will generate. Then the <strong>"Return Line"</strong> will populate.</td>
+              </tr>
+              <tr>
+                <td class="border px-2 py-1 font-semibold text-gray-700">4</td>
+                <td class="border px-2 py-1">Return Line (DEFNR Item)</td>
+                <td class="border px-2 py-1">
+                  <ul class="list-disc list-inside ml-4">
+                    <li>Select <strong>"New Sales Return Line"</strong> in the right corner.</li>
+                    <li>Type: Item</li>
+                    <li>Product: SKU number</li>
+                    <li>Unit Price Excl. Tax: $0.00</li>
+                    <li>Quantity: # of items defective</li>
+                    <li>Location: DEFNR</li>
+                    <li>Return Reason Code: DEFNR</li>
+                    <li>Click <strong>"Save & Close"</strong></li>
+                  </ul>
+                </td>
+              </tr>
+              <tr class="bg-blue-50">
+                <td class="border px-2 py-1 font-semibold text-gray-700">5</td>
+                <td class="border px-2 py-1">Return Line (CRMSO Comment)</td>
+                <td class="border px-2 py-1">
+                  <ul class="list-disc list-inside ml-4">
+                    <li>Select <strong>"+ New Sales Return Line"</strong>:</li>
+                    <li>Type: Comment</li>
+                    <li>Description: CREATED (Ex. CRMSO12345). You can get this order number once you finish creating Sales Order.</li>
+                    <li>Click <strong>"Save & Close"</strong></li>
+                  </ul>
+                </td>
+              </tr>
+              <tr>
+                <td class="border px-2 py-1 font-semibold text-gray-700">6</td>
+                <td class="border px-2 py-1">Pre-Submission Note</td>
+                <td class="border px-2 py-1">Before you submit, you need to first complete the Sales Order for DEFNR process. For reference, just search "RMA DEFNR" or "Process to Create No Cost Order" for the process.</td>
+              </tr>
+              <tr class="bg-blue-50">
+                <td class="border px-2 py-1 font-semibold text-gray-700">7</td>
+                <td class="border px-2 py-1">Timeline</td>
+                <td class="border px-2 py-1">
+                  <ul class="list-disc list-inside ml-4">
+                    <li>Double click in the <em>"Enter a Note"</em></li>
+                    <li>Who, What, What (Note Content)</li>
+                    <li>Click <strong>"Add note and close"</strong></li>
+                  </ul>
+                </td>
+              </tr>
+              <tr>
+                <td class="border px-2 py-1 font-semibold text-gray-700">8</td>
+                <td class="border px-2 py-1">Submit Return</td>
+                <td class="border px-2 py-1">Click <strong>"Submit Return"</strong>.</td>
+              </tr>
+            </tbody>
+          </table>
+        </li>
+      </ol>`
+    },
+    {
+      question: "Process to create Canadian Sales Order",
+      answer: `
+      <h2 class="text-xl font-semibold text-gray-700 mb-2">Process to create Canadian Sales Order</h2>
+      <h3 class="text-lg font-medium text-gray-600 mb-1">Step by Step process</h3>
+      <ol class="list-decimal list-inside text-gray-800 space-y-1">
+        <li>
+          <table class="table-auto border border-gray-300 my-2 text-sm w-full">
+            <thead>
+              <tr class="bg-blue-600 text-white">
+                <th class="border px-2 py-1">Step</th>
+                <th class="border px-2 py-1">Section/Field</th>
+                <th class="border px-2 py-1">Details</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="bg-blue-50">
+                <td class="border px-2 py-1 font-semibold text-gray-700">1</td>
+                <td class="border px-2 py-1">Navigation</td>
+                <td class="border px-2 py-1">Select <strong>"Orders"</strong> on the left in the side panel under <strong>"Order Processing"</strong>. Then select <strong>"+ New"</strong>.</td>
+              </tr>
+              <tr>
+                <td class="border px-2 py-1 font-semibold text-gray-700">2</td>
+                <td class="border px-2 py-1">Summary Section</td>
+                <td class="border px-2 py-1">
+                  <ul class="list-disc list-inside ml-4">
+                    <li>Customer: <strong>"10081"</strong> select <strong>"Consumer GSM"</strong></li>
+                    <li>Contact No: Type in the <strong>"Customer Name"</strong>, then select the name.</li>
+                    <li>External Doc No: <strong>RMA number</strong></li>
+                    <li>Shipment Date: Set 3 business days out. Do not include weekends or holidays.</li>
+                    <li>Campaign No: <strong>GT- Customer Service</strong></li>
+                    <li>Location Code: <strong>ROC</strong></li>
+                    <li>Payment Terms Code: <strong>EX= Exchange</strong></li>
+                    <li>Payment Method Code: <strong>EX= Exchange</strong></li>
+                    <li>Shipping Method: <strong>FedEx</strong></li>
+                  </ul>
+                </td>
+              </tr>
+              <tr class="bg-blue-50">
+                <td class="border px-2 py-1 font-semibold text-gray-700">3</td>
+                <td class="border px-2 py-1">Save & Populate</td>
+                <td class="border px-2 py-1">Select <strong>"Save"</strong>. Once saved, the <strong>"Billing and Shipping"</strong> & <strong>"Product Line"</strong> will generate.</td>
+              </tr>
+              <tr>
+                <td class="border px-2 py-1 font-semibold text-gray-700">4</td>
+                <td class="border px-2 py-1">Billing & Shipping</td>
+                <td class="border px-2 py-1">Confirm address for billing & shipping is complete.</td>
+              </tr>
+              <tr class="bg-blue-50">
+                <td class="border px-2 py-1 font-semibold text-gray-700">5</td>
+                <td class="border px-2 py-1">Product Line (Main Item)</td>
+                <td class="border px-2 py-1">
+                  <ul class="list-disc list-inside ml-4">
+                    <li>Select <strong>"+ Add Product"</strong></li>
+                    <li>Existing Product: Add sku #</li>
+                    <li>Pricing: (Leave off)</li>
+                    <li>Price Per Unit: Price of the item</li>
+                    <li>Quantity: # of items</li>
+                    <li>Click <strong>"Save & Close"</strong></li>
+                  </ul>
+                </td>
+              </tr>
+              <tr>
+                <td class="border px-2 py-1 font-semibold text-gray-700">6</td>
+                <td class="border px-2 py-1">Product Line (Warranty Replacement)</td>
+                <td class="border px-2 py-1">
+                  <ul class="list-disc list-inside ml-4">
+                    <li>Select <strong>"+ Add Product"</strong></li>
+                    <li>Existing Product: <strong>INTL-Warranty Replacement</strong></li>
+                    <li>Pricing: (Leave off)</li>
+                    <li>Price Per Unit: $1.00</li>
+                    <li>Quantity: add #1</li>
+                    <li>Click <strong>"Save & Close"</strong></li>
+                  </ul>
+                </td>
+              </tr>
+              <tr class="bg-blue-50">
+                <td class="border px-2 py-1 font-semibold text-gray-700">7</td>
+                <td class="border px-2 py-1">Product Line (Pre-Paid/Clearance)</td>
+                <td class="border px-2 py-1">
+                  <ul class="list-disc list-inside ml-4">
+                    <li>Select <strong>"+ Add Product"</strong></li>
+                    <li>Existing Product: Sku #</li>
+                    <li>Comment: <strong>PRE-PAID/PRE-CLEAR-GSM</strong></li>
+                    <li>Pricing: Turn Toggle on</li>
+                    <li>Price Per Unit: $0.00</li>
+                    <li>Quantity: add #1</li>
+                    <li>Click <strong>"Save & Close"</strong></li>
+                  </ul>
+                </td>
+              </tr>
+              <tr>
+                <td class="border px-2 py-1 font-semibold text-gray-700">8</td>
+                <td class="border px-2 py-1">Timeline</td>
+                <td class="border px-2 py-1">
+                  <ul class="list-disc list-inside ml-4">
+                    <li>Double click in the <em>"Enter a Note"</em></li>
+                    <li>Who, What, What (Note Content)</li>
+                    <li>Click <strong>"Add note and close"</strong></li>
+                  </ul>
+                </td>
+              </tr>
+              <tr class="bg-blue-50">
+                <td class="border px-2 py-1 font-semibold text-gray-700">9</td>
+                <td class="border px-2 py-1">Submit Order</td>
+                <td class="border px-2 py-1">Click <strong>"Submit Order"</strong>.</td>
+              </tr>
+            </tbody>
+          </table>
+        </li>
+      </ol>`
+    },
+    {
+      question: "Process to create a Replacement Clip Order",
+      answer: `
+      <h2 class="text-xl font-semibold text-gray-700 mb-2">Process to create a Replacement Clip Order</h2>
+      <h3 class="text-lg font-medium text-gray-600 mb-1">Step by Step process</h3>
+      <ol class="list-decimal list-inside text-gray-800 space-y-1">
+        <li>
+          <table class="table-auto border border-gray-300 my-2 text-sm w-full">
+            <thead>
+              <tr class="bg-blue-600 text-white">
+                <th class="border px-2 py-1">Step</th>
+                <th class="border px-2 py-1">Section/Field</th>
+                <th class="border px-2 py-1">Details</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="bg-blue-50">
+                <td class="border px-2 py-1 font-semibold text-gray-700">1</td>
+                <td class="border px-2 py-1">Navigation</td>
+                <td class="border px-2 py-1">Select <strong>"Orders"</strong> on the left in the side panel under <strong>"Order Processing"</strong>. Then select <strong>"+ New"</strong>.</td>
+              </tr>
+              <tr>
+                <td class="border px-2 py-1 font-semibold text-gray-700">2</td>
+                <td class="border px-2 py-1">Summary Section</td>
+                <td class="border px-2 py-1">
+                  <ul class="list-disc list-inside ml-4">
+                    <li>Customer: <strong>"10081"</strong> select <strong>"Consumer GSM"</strong></li>
+                    <li>Contact No: Type in the <strong>"Customer Name"</strong>, then select the name.</li>
+                    <li>External Doc No: Use First name, Last name Initial followed by month & date</li>
+                    <li>Shipment Date: Set 3 business days out. Do not include weekends or holidays.</li>
+                    <li>Campaign No: <strong>GT- Customer Service</strong></li>
+                    <li>Location Code: <strong>ROC</strong></li>
+                    <li>Payment Terms Code: <strong>"Leave Blank"</strong></li>
+                    <li>Payment Method Code: <strong>"CRMCCARD"</strong></li>
+                    <li>Shipping Method: <strong>USPS</strong></li>
+                  </ul>
+                </td>
+              </tr>
+              <tr class="bg-blue-50">
+                <td class="border px-2 py-1 font-semibold text-gray-700">3</td>
+                <td class="border px-2 py-1">Save & Populate</td>
+                <td class="border px-2 py-1">Select <strong>"Save"</strong>. Once saved, the Product Line will generate.</td>
+              </tr>
+              <tr>
+                <td class="border px-2 py-1 font-semibold text-gray-700">4</td>
+                <td class="border px-2 py-1">Billing and Shipping Address</td>
+                <td class="border px-2 py-1">Confirm customer address in billing & shipping.</td>
+              </tr>
+              <tr class="bg-blue-50">
+                <td class="border px-2 py-1 font-semibold text-gray-700">5</td>
+                <td class="border px-2 py-1">Product Line (SOG Component)</td>
+                <td class="border px-2 py-1">
+                  <ul class="list-disc list-inside ml-4">
+                    <li>Select <strong>"+ Add Product"</strong></li>
+                    <li>Existing Product: <strong>SOG-COMP= SOG Component</strong></li>
+                    <li>Pricing: Turn toggle on</li>
+                    <li>Comment: (Example: Terminus XR Clip-Black Left)</li>
+                    <li>Price Per Unit: $0.00</li>
+                    <li>Quantity: # of clips</li>
+                    <li>Select <strong>"Save & Close"</strong></li>
+                  </ul>
+                </td>
+              </tr>
+              <tr>
+                <td class="border px-2 py-1 font-semibold text-gray-700">6</td>
+                <td class="border px-2 py-1">Product Line (Shipping Charges)</td>
+                <td class="border px-2 py-1">
+                  <ul class="list-disc list-inside ml-4">
+                    <li>Select <strong>"+ Add Product"</strong></li>
+                    <li>Existing Product: <strong>"ESQ"</strong></li>
+                    <li>Pricing: Turn Toggle on</li>
+                    <li>Price Per Unit: $5.00</li>
+                    <li>Quantity: #1</li>
+                    <li>Select <strong>"Save & Close"</strong></li>
+                  </ul>
+                </td>
+              </tr>
+              <tr class="bg-blue-50">
+                <td class="border px-2 py-1 font-semibold text-gray-700">7</td>
+                <td class="border px-2 py-1">Authorize Payment</td>
+                <td class="border px-2 py-1">Select <strong>"Authorize Payment"</strong>.</td>
+              </tr>
+              <tr>
+                <td class="border px-2 py-1 font-semibold text-gray-700">8</td>
+                <td class="border px-2 py-1">Credit Card Payment Authorization (Pop-up)</td>
+                <td class="border px-2 py-1">
+                  <ul class="list-disc list-inside ml-4">
+                    <li>Customer</li>
+                    <li>Credit Card: Select last 4 digits of the card on file (DO NOT REPEAT)</li>
+                    <li>Authorize: Pay Flow</li>
+                    <li>Card code: 3 digit CVV (DO NOT REPEAT)</li>
+                    <li>Amount: Make sure correct amount is showing</li>
+                    <li>Address</li>
+                    <li>Select <strong>"Authorize"</strong></li>
+                  </ul>
+                </td>
+              </tr>
+              <tr class="bg-blue-50">
+                <td class="border px-2 py-1 font-semibold text-gray-700">9</td>
+                <td class="border px-2 py-1">Authorization Confirmation</td>
+                <td class="border px-2 py-1">Once authorized, you will see message <strong>"This transaction has been authorized"</strong>. Exit out of the pop-up.</td>
+              </tr>
+              <tr>
+                <td class="border px-2 py-1 font-semibold text-gray-700">10</td>
+                <td class="border px-2 py-1">Save</td>
+                <td class="border px-2 py-1">Click <strong>"Save"</strong>.</td>
+              </tr>
+              <tr class="bg-blue-50">
+                <td class="border px-2 py-1 font-semibold text-gray-700">11</td>
+                <td class="border px-2 py-1">Timeline</td>
+                <td class="border px-2 py-1">
+                  <ul class="list-disc list-inside ml-4">
+                    <li>Double click in the <em>"Enter a Note"</em></li>
+                    <li>Who, What, What (Note Content)</li>
+                    <li>Click <strong>"Add note and close"</strong></li>
+                  </ul>
+                </td>
+              </tr>
+              <tr>
+                <td class="border px-2 py-1 font-semibold text-gray-700">12</td>
+                <td class="border px-2 py-1">Submit Order</td>
+                <td class="border px-2 py-1">Click <strong>"Submit Order"</strong>.</td>
+              </tr>
+            </tbody>
+          </table>
+        </li>
+      </ol>`
+    },
+    {
+      question: "Process to Create Sharpening RMA",
+      answer: `
+      <h2 class="text-xl font-semibold text-gray-700 mb-2">Process to Create Sharpening RMA</h2>
+      <h3 class="text-lg font-medium text-gray-600 mb-1">Step by Step process</h3>
+      <ol class="list-decimal list-inside text-gray-800 space-y-1">
+        <li>
+          <table class="table-auto border border-gray-300 my-2 text-sm w-full">
+            <thead>
+              <tr class="bg-blue-600 text-white">
+                <th class="border px-2 py-1">Step</th>
+                <th class="border px-2 py-1">Section/Field</th>
+                <th class="border px-2 py-1">Details</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="bg-blue-50">
+                <td class="border px-2 py-1 font-semibold text-gray-700">1</td>
+                <td class="border px-2 py-1">Navigation</td>
+                <td class="border px-2 py-1">Select <strong>"Sales Return"</strong> on the left in the side panel under <strong>"Order Processing"</strong>. Then select <strong>"+ New"</strong>.</td>
+              </tr>
+              <tr>
+                <td class="border px-2 py-1 font-semibold text-gray-700">2</td>
+                <td class="border px-2 py-1">General Section</td>
+                <td class="border px-2 py-1">
+                  <ul class="list-disc list-inside ml-4">
+                    <li>Customer: <strong>"10081"</strong> select <strong>"Consumer GSM"</strong></li>
+                    <li>Contact Name: Type in the <strong>"Customer Name"</strong>, then select the name.</li>
+                    <li>External Document No.: Purchased through 3rd party dealer. Use First name, Last name Initial followed by month & date.</li>
+                  </ul>
+                </td>
+              </tr>
+              <tr class="bg-blue-50">
+                <td class="border px-2 py-1 font-semibold text-gray-700">3</td>
+                <td class="border px-2 py-1">Save & Populate</td>
+                <td class="border px-2 py-1">Click <strong>"Save"</strong>. Once <strong>"Saved"</strong>, the customer information will generate. Then the <strong>"Return Line"</strong> will populate.</td>
+              </tr>
+              <tr>
+                <td class="border px-2 py-1 font-semibold text-gray-700">4</td>
+                <td class="border px-2 py-1">Return Line</td>
+                <td class="border px-2 py-1">
+                  <ul class="list-disc list-inside ml-4">
+                    <li>Select <strong>"+ New Sales Return Line"</strong></li>
+                    <li>Type: Item</li>
+                    <li>Product: SKU # of item</li>
+                    <li>Unit Price Excl. Tax: $0.00</li>
+                    <li>Quantity: # of knives returning</li>
+                    <li>Location: Select location code for which brand knife they have:
+                      <ul class="list-circle list-inside ml-4">
+                        <li>SOG-SOG-SHRP</li>
+                        <li>for Cold Steel (CS-SHRP)</li>
+                        <li>for SOG (CS-SOG)</li>
+                      </ul>
+                    </li>
+                    <li>Return Reason Code: Sharps</li>
+                    <li>Click <strong>"Save & Close"</strong></li>
+                  </ul>
+                </td>
+              </tr>
+              <tr class="bg-blue-50">
+                <td class="border px-2 py-1 font-semibold text-gray-700">5</td>
+                <td class="border px-2 py-1">Important Notes</td>
+                <td class="border px-2 py-1">
+                  <ul class="list-disc list-inside ml-4">
+                    <li>"We sharpen knives in batches, so it may take up to 8 weeks before your knife is returned to you."</li>
+                    <li>Make sure when you send the Return Instructions you change the RMA123456 to SSA (example: SSA123456)</li>
+                  </ul>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </li>
+      </ol>`
+    },
+    {
+      question: "Process to create Sharpening Sales Order",
+      answer: `
+      <h2 class="text-xl font-semibold text-gray-700 mb-2">Process to create Sharpening Sales Order</h2>
+      <h3 class="text-lg font-medium text-gray-600 mb-1">Step by Step process</h3>
+      <ol class="list-decimal list-inside text-gray-800 space-y-1">
+        <li>
+          <table class="table-auto border border-gray-300 my-2 text-sm w-full">
+            <thead>
+              <tr class="bg-blue-600 text-white">
+                <th class="border px-2 py-1">Step</th>
+                <th class="border px-2 py-1">Section/Field</th>
+                <th class="border px-2 py-1">Details</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="bg-blue-50">
+                <td class="border px-2 py-1 font-semibold text-gray-700">1</td>
+                <td class="border px-2 py-1">Navigation</td>
+                <td class="border px-2 py-1">Select <strong>"Orders"</strong> on the left in the side panel under <strong>"Order Processing"</strong>. Then select <strong>"+ New"</strong>.</td>
+              </tr>
+              <tr>
+                <td class="border px-2 py-1 font-semibold text-gray-700">2</td>
+                <td class="border px-2 py-1">Summary Section</td>
+                <td class="border px-2 py-1">
+                  <ul class="list-disc list-inside ml-4">
+                    <li>Customer: <strong>"10081"</strong> select <strong>"Consumer GSM"</strong></li>
+                    <li>Contact No: Type in the <strong>"Customer Name"</strong>, then select the name.</li>
+                    <li>External Doc No: Use First name, Last name Initial followed by month & date</li>
+                    <li>Campaign No: <strong>GT- Customer Service</strong></li>
+                    <li>Location Code: <strong>ROC</strong></li>
+                    <li>Payment Terms Code: (Leave Blank)</li>
+                    <li>Payment Method Code: <strong>CRMCCARD</strong></li>
+                    <li>Shipping Method: <strong>USPS</strong></li>
+                  </ul>
+                </td>
+              </tr>
+              <tr class="bg-blue-50">
+                <td class="border px-2 py-1 font-semibold text-gray-700">3</td>
+                <td class="border px-2 py-1">Save & Populate</td>
+                <td class="border px-2 py-1">Select <strong>"Save"</strong>. Once <strong>"Saved"</strong> the <strong>"Product Line"</strong> will generate.</td>
+              </tr>
+              <tr>
+                <td class="border px-2 py-1 font-semibold text-gray-700">4</td>
+                <td class="border px-2 py-1">Billing and Shipping Address</td>
+                <td class="border px-2 py-1">
+                  <ul class="list-disc list-inside ml-4">
+                    <li>Confirm customer address in billing & shipping.</li>
+                    <li>Select <strong>"Save"</strong></li>
+                  </ul>
+                </td>
+              </tr>
+              <tr class="bg-blue-50">
+                <td class="border px-2 py-1 font-semibold text-gray-700">5</td>
+                <td class="border px-2 py-1">Product Line</td>
+                <td class="border px-2 py-1">
+                  <ul class="list-disc list-inside ml-4">
+                    <li>Select <strong>"+ Add Product"</strong></li>
+                    <li>Existing Product: Add sku #</li>
+                    <li>Pricing: Turn toggle on</li>
+                    <li>Price Per Unit: $10.00 per knife</li>
+                    <li>Quantity: # of items purchasing</li>
+                    <li>Select <strong>"Save & Close"</strong></li>
+                  </ul>
+                </td>
+              </tr>
+              <tr>
+                <td class="border px-2 py-1 font-semibold text-gray-700">6</td>
+                <td class="border px-2 py-1">Authorize Payment</td>
+                <td class="border px-2 py-1">Select <strong>"Authorize Payment"</strong>.</td>
+              </tr>
+              <tr class="bg-blue-50">
+                <td class="border px-2 py-1 font-semibold text-gray-700">7</td>
+                <td class="border px-2 py-1">Credit Card Payment Authorization (Pop-up)</td>
+                <td class="border px-2 py-1">
+                  <ul class="list-disc list-inside ml-4">
+                    <li>Customer</li>
+                    <li>Credit Card: Select last 4 digits of the card on file (DO NOT REPEAT)</li>
+                    <li>Authorize: Pay Flow</li>
+                    <li>Card code: 3 digit CVV (DO NOT REPEAT)</li>
+                    <li>Amount: Make sure correct amount is showing</li>
+                    <li>Address</li>
+                    <li>Select <strong>"Authorize"</strong></li>
+                  </ul>
+                </td>
+              </tr>
+              <tr>
+                <td class="border px-2 py-1 font-semibold text-gray-700">8</td>
+                <td class="border px-2 py-1">Authorization Confirmation</td>
+                <td class="border px-2 py-1">Once authorized, you will see message <strong>"This transaction has been authorized"</strong>. Exit out of the pop-up.</td>
+              </tr>
+              <tr class="bg-blue-50">
+                <td class="border px-2 py-1 font-semibold text-gray-700">9</td>
+                <td class="border px-2 py-1">Save</td>
+                <td class="border px-2 py-1">Click <strong>"Save"</strong>.</td>
+              </tr>
+              <tr>
+                <td class="border px-2 py-1 font-semibold text-gray-700">10</td>
+                <td class="border px-2 py-1">Timeline</td>
+                <td class="border px-2 py-1">
+                  <ul class="list-disc list-inside ml-4">
+                    <li>Double click in the <em>"Enter a Note"</em></li>
+                    <li>Who, What, What (Note Content)</li>
+                    <li>Click <strong>"Add note and close"</strong></li>
+                  </ul>
+                </td>
+              </tr>
+              <tr class="bg-blue-50">
+                <td class="border px-2 py-1 font-semibold text-gray-700">11</td>
+                <td class="border px-2 py-1">Submit Order</td>
+                <td class="border px-2 py-1">Click <strong>"Submit Order"</strong>.</td>
+              </tr>
+            </tbody>
+          </table>
+        </li>
+        <li>Note:
+          <ul class="list-disc list-inside ml-6 text-gray-800">
+            <li>“We sharpen knives in batches, so it may take up to 8 weeks before your knife is returned to you.”</li>
+          </ul>
+        </li>
+      </ol>`
+    }
+  ];
+
+  const chatForm = document.getElementById("chat-form");
+  const userInput = document.getElementById("user-input");
+  const partialResults = document.getElementById("partial-results");
+  const answerContainer = document.getElementById("answer-container");
+  const mainContainer = document.getElementById("main-container");
+  const fullAnswer = document.getElementById("full-answer");
+  const backButton = document.getElementById("back-button");
+
+  // Sidebar elements
+  const hamburgerMenuLeft = document.getElementById("hamburger-menu-left");
+  const sidebarLeft = document.getElementById("sidebar-left");
+  const closeSidebarLeftButton = document.getElementById("close-sidebar-left");
+
+  const hamburgerMenuRight = document.getElementById("hamburger-menu-right");
+  const sidebarRight = document.getElementById("sidebar-right");
+  const closeSidebarRightButton = document.getElementById("close-sidebar-right");
+
+  const overlay = document.getElementById("overlay");
+  const body = document.body; // Reference to the body for margin adjustment
+
+  // Function to highlight matching text
+  function highlightMatch(text, query) {
+    if (!query) return text;
+    // Escape special characters in the query to be used in a regex
+    const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(`(${escapedQuery})`, 'gi');
+    return text.replace(regex, '<span class="highlight">$1</span>');
+  }
+
+  // Show partial matches as user types
+  userInput.addEventListener("input", () => {
+    const val = userInput.value.trim();
+    partialResults.innerHTML = ""; // Clear previous partial results
+
+    if (val.length === 0) {
+      return;
+    }
+
+    const matches = knowledgeBase.filter(item =>
+      item.question.toLowerCase().includes(val.toLowerCase())
+    );
+
+    if (matches.length === 0) {
+      partialResults.innerHTML = `<p class="text-red-600 font-semibold">No matching questions found.</p>`;
+      return;
+    }
+
+    matches.forEach((item, index) => {
+      const div = document.createElement("div");
+      div.className = "bg-white p-3 rounded shadow cursor-pointer hover:bg-gray-50 suggestion-item transition-colors duration-300";
+      div.style.animationDelay = `${index * 0.05}s`; // Stagger animation
+
+      // Apply highlighting to the question title
+      div.innerHTML = highlightMatch(item.question, val);
+
+      div.onclick = () => showFullAnswer(item);
+      partialResults.appendChild(div);
+    });
+  });
+
+  chatForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const val = userInput.value.trim().toLowerCase();
+    if (val.length === 0) return;
+
+    const found = knowledgeBase.find(item =>
+      item.question.toLowerCase() === val
+    );
+    if (found) {
+      showFullAnswer(found);
+    } else {
+      // If no exact match, but there are partial suggestions, let them choose.
+      // If no suggestions at all, show "no exact match" message.
+      if (partialResults.children.length === 0 || partialResults.innerHTML.includes("No matching questions found.")) {
+          partialResults.innerHTML = `<p class="text-red-600 font-semibold">No exact match found. Please refine your search or select from suggestions.</p>`;
+      }
+    }
+  });
+
+  function showFullAnswer(item) {
+    mainContainer.classList.add("hidden");
+    answerContainer.classList.remove("hidden");
+    fullAnswer.innerHTML = `
+      <h1 class="text-3xl font-bold text-gray-900 mb-6">${item.question}</h1>
+      <div class="leading-relaxed">
+        ${item.answer}
+      </div>
+    `;
+    window.scrollTo(0, 0); // Scroll to top when showing the answer
+  }
+
+  backButton.addEventListener("click", () => {
+    answerContainer.classList.add("hidden");
+    mainContainer.classList.remove("hidden");
+    userInput.value = "";
+    partialResults.innerHTML = ""; // Clear partial results when going back
+    userInput.focus();
+  });
+
+  // Sidebar functionality - Left
+  function openSidebarLeft() {
+    sidebarLeft.classList.add('open');
+    overlay.classList.add('active');
+    body.classList.add('sidebar-left-open'); // Add class to body to adjust margin
+  }
+
+  function closeSidebarLeft() {
+    sidebarLeft.classList.remove('open');
+    overlay.classList.remove('active');
+    body.classList.remove('sidebar-left-open'); // Remove class from body
+  }
+
+  hamburgerMenuLeft.addEventListener('click', openSidebarLeft);
+  closeSidebarLeftButton.addEventListener('click', closeSidebarLeft);
+
+  // Sidebar functionality - Right
+  function openSidebarRight() {
+    sidebarRight.classList.add('open');
+    overlay.classList.add('active');
+    body.classList.add('sidebar-right-open'); // Add class to body to adjust margin
+  }
+
+  function closeSidebarRight() {
+    sidebarRight.classList.remove('open');
+    overlay.classList.remove('active');
+    body.classList.remove('sidebar-right-open'); // Remove class from body
+  }
+
+  hamburgerMenuRight.addEventListener('click', openSidebarRight);
+  closeSidebarRightButton.addEventListener('click', closeSidebarRight);
+
+  // Close both sidebars when clicking overlay
+  overlay.addEventListener('click', () => {
+    closeSidebarLeft();
+    closeSidebarRight();
+  });
+
+  // Collapsible section functionality for right sidebar
+  document.querySelectorAll('.collapsible-header').forEach(header => {
+    header.addEventListener('click', () => {
+      const targetId = header.dataset.target;
+      const content = document.getElementById(targetId);
+      const arrow = header.querySelector('.arrow');
+
+      if (content.classList.contains('open')) {
+        content.classList.remove('open');
+        content.style.maxHeight = '0';
+        arrow.classList.remove('rotate');
+      } else {
+        // Close other open sections before opening the new one
+        document.querySelectorAll('.collapsible-content.open').forEach(openContent => {
+          openContent.classList.remove('open');
+          openContent.style.maxHeight = '0';
+          openContent.previousElementSibling.querySelector('.arrow').classList.remove('rotate');
+        });
+
+        content.classList.add('open');
+        content.style.maxHeight = content.scrollHeight + 'px'; // Set max-height to scrollHeight
+        arrow.classList.add('rotate');
+      }
+    });
+  });
+</script>
+</body>
+</html>
